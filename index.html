@@ -110,10 +110,13 @@ const fmt = n => n.toLocaleString("cs-CZ");
 document.getElementById("cnt").textContent = fmt(D.length);
 
 const map = L.map("map",{zoomControl:true,preferCanvas:true}).setView([49.4,17.2],7);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{
-  maxZoom:19,subdomains:"abcd",
-  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+const OSM = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
+let tileErr=0;
+OSM.on("tileerror",()=>{ if(++tileErr===4){ map.removeLayer(OSM);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{
+    maxZoom:19,attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap'}).addTo(map); }});
 
 const icon = L.divIcon({className:"",html:'<div class="pin"></div>',iconSize:[16,16],iconAnchor:[8,8],popupAnchor:[0,-8]});
 const group = L.markerClusterGroup({
